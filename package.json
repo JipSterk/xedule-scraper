@@ -1,0 +1,22 @@
+{
+  "name": "xedule-scraper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon -r esm index.js"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "cheerio": "^1.0.0-rc.3",
+    "dotenv": "^8.0.0",
+    "esm": "^3.2.22",
+    "express": "^4.16.4",
+    "node-cron": "^2.0.3",
+    "puppeteer": "^1.16.0"
+  },
+  "devDependencies": {
+    "@types/puppeteer": "^1.12.4",
+    "nodemon": "^1.19.0"
+  }
+}
