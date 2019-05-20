@@ -8,28 +8,16 @@ cron.schedule("0 0 * * 1", async () => {
 });
 
 async function getHtml() {
-  const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: {
-      width: 1519,
-      height: 726
-    }
-  });
-
+  const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  await page.goto("https://sa-nhlstenden.xedule.nl", {
-    waitUntil: "networkidle2"
-  });
+  await page.goto("https://sa-nhlstenden.xedule.nl");
 
-  // await page.authenticate({
-  //   username: process.env.USERNAME,
-  //   password: process.env.PASSWORD
-  // });
-
-  await page.type("#userNameInput", process.env.USER_NAME);
+  await page.type("#userNameInput", process.env.USERNAME);
   await page.type("#passwordInput", process.env.PASSWORD);
   await page.click("#submitButton");
-  await page.waitForNavigation();
+  await page.waitForSelector(".search-toggle");
+
+  await page.click(".search-toggle");
 
   for (const text of [
     "IC_ICT_HBO ICT 1B",
@@ -37,21 +25,27 @@ async function getHtml() {
     "IC_ICT_Internet of Things (INTH) - groep b"
   ]) {
     await page.type("#rosterEntitiesSelector-entity-filter", text);
+    await page.keyboard.down("Enter");
+    await page.waitForSelector("#rosterEntitiesSelector-entity-filter");
   }
 
-  await page.waitForNavigation();
-  await page("Page.setDownloadBehavior", {
-    behavior: "allow",
-    downloadPath: path.resolve(__dirname)
-  });
-  await page.click(".k-view-ics");
-  // page.on("response", console.log);
+  await page.click(".search-toggle");
+  await page.click("li.k-current-view>a.k-link");
 
+  const downloadPath = path.resolve(
+    process.cwd(),
+    `download-${Math.random()
+      .toString(36)
+      .substr(2, 8)}`
+  );
+
+  await page._client.send("Page.setDownloadBehavior", {
+    behavior: "allow",
+    downloadPath: downloadPath
+  });
+
+  await page.click(".k-view-ics");
   await browser.close();
 }
 
-async function login() {
-  await getHtml();
-}
-
-login();
+getHtml();
