@@ -4,14 +4,15 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon -r esm index.js"
+    "start": "cross-env NODE_ENV=production nodemon -r esm index.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "cheerio": "^1.0.0-rc.3",
+    "cross-env": "^5.2.0",
     "dotenv": "^8.0.0",
     "esm": "^3.2.22",
     "express": "^4.16.4",
+    "googleapis": "^40.0.0",
     "node-cron": "^2.0.3",
     "puppeteer": "^1.16.0"
   },
