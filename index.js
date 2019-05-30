@@ -71,11 +71,7 @@ async function getICS() {
  * @returns {Promise<void>}
  */
 async function manualLogin(page) {
-  try {
-    await page.type("#userNameInput", process.env.USERNAME);
-  } catch (error) {
-    throw new Error();
-  }
+  await page.type("#userNameInput", process.env.USERNAME);
   await page.type("#passwordInput", process.env.PASSWORD);
   await page.click("#submitButton");
 }
