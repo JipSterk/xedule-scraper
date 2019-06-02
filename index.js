@@ -56,7 +56,7 @@ async function getICS() {
     downloadPath
   });
 
-  await page.click(".k-view-ics");
+  await page.click(".k-state-default.k-view-ics");
 
   let fileName;
   while (!fileName || fileName.endsWith(".crdownload")) {
