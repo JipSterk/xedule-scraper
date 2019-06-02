@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "dotenv-safe/config";
 import fs from "fs";
 import cron from "node-cron";
 import path from "path";
