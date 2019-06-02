@@ -1,4 +1,4 @@
-import "dotenv-safe/config";
+import "dotenv/config";
 import fs from "fs";
 import cron from "node-cron";
 import path from "path";
@@ -48,7 +48,7 @@ async function getICS() {
   await page.click("li.k-current-view>a.k-link");
 
   const downloadPath = path.resolve(__dirname, "downloads");
-  if (!util.promisify(fs.exists)(downloadPath))
+  if (!(await util.promisify(fs.exists)(downloadPath)))
     await util.promisify(fs.mkdir)(downloadPath);
 
   await page._client.send("Page.setDownloadBehavior", {
