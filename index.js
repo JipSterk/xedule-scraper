@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "dotenv-safe/config";
 import fs from "fs";
 import cron from "node-cron";
 import path from "path";
@@ -26,7 +26,7 @@ async function getICS() {
     await manualLogin(page);
   } catch (error) {
     await page.authenticate({
-      username: process.env.USERNAME,
+      username: process.env.USER_NAME,
       password: process.env.PASSWORD
     });
   }
@@ -53,7 +53,7 @@ async function getICS() {
 
   await page._client.send("Page.setDownloadBehavior", {
     behavior: "allow",
-    downloadPath: downloadPath
+    downloadPath
   });
 
   await page.click(".k-view-ics");
@@ -76,7 +76,7 @@ async function getICS() {
  * @returns {Promise<void>}
  */
 async function manualLogin(page) {
-  await page.type("#userNameInput", process.env.USERNAME);
+  await page.type("#userNameInput", process.env.USER_NAME);
   await page.type("#passwordInput", process.env.PASSWORD);
   await page.click("#submitButton");
 }
