@@ -6,13 +6,14 @@ import puppeteer from "puppeteer";
 import util from "util";
 
 cron.schedule("0 0 * * 1", async () => {
-  await getICS();
+  const filePath = await getICS();
+  console.log(filePath);
   // await importIntoCalender();
 });
 
 /**
  * Gets .ics file
- * @returns {Promise<void>}
+ * @returns {Promise<string>} the path of the downloaded file
  */
 async function getICS() {
   const browser = await puppeteer.launch({
@@ -36,7 +37,7 @@ async function getICS() {
   for (const text of [
     "IC_ICT_HBO ICT 1B",
     "IC_ICT VT_EXAM Y1",
-    "IC_ICT_Internet of Things (INTH) - groep b"
+    "IC_ICT_Internet of Things (INTH) - groep a"
   ]) {
     await page.type("#rosterEntitiesSelector-entity-filter", text);
     await page.keyboard.down("Enter");
@@ -63,6 +64,10 @@ async function getICS() {
     [fileName] = await util.promisify(fs.readdir)(downloadPath);
   }
   await browser.close();
+
+  const filePath = path.resolve(downloadPath, fileName);
+
+  return filePath;
 }
 
 /**
