@@ -4,15 +4,17 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon -r esm index.js"
+    "start": "cross-env NODE_ENV=development nodemon -r esm index.js login --username jip.sterk@student.nhlstenden.com --password Sz2$j53RlGrT"
   },
   "dependencies": {
     "cross-env": "^5.2.0",
     "dotenv-safe": "^6.1.0",
     "esm": "^3.2.22",
     "googleapis": "^40.0.0",
+    "keytar": "^4.9.0",
     "node-cron": "^2.0.3",
-    "puppeteer": "^1.16.0"
+    "puppeteer": "^1.16.0",
+    "yargs": "^13.2.4"
   },
   "devDependencies": {
     "@types/puppeteer": "^1.12.4",

@@ -1,9 +1,19 @@
-import "dotenv/config";
-import fs from "fs";
-import cron from "node-cron";
-import path from "path";
-import puppeteer from "puppeteer";
-import util from "util";
+// import "dotenv/config";
+// import fs from "fs";
+// import keytar from "keytar";
+// import cron from "node-cron";
+// import path from "path";
+// import puppeteer from "puppeteer";
+// import util from "util";
+// import yargs from "yargs";
+
+const fs = require("fs");
+const keytar = require("keytar");
+const cron = require("node-cron");
+const path = require("path");
+const puppeteer = require("puppeteer");
+const util = require("util");
+const yargs = require("yargs");
 
 cron.schedule("0 0 * * 1", async () => {
   const filePath = await getICS();
@@ -16,6 +26,10 @@ cron.schedule("0 0 * * 1", async () => {
  * @returns {Promise<string>} the path of the downloaded file
  */
 async function getICS() {
+  const [{ account: username, password }] = await keytar.findCredentials(
+    "xedule-scraper"
+  );
+
   const browser = await puppeteer.launch({
     headless: process.env.NODE_ENV === "production"
   });
@@ -23,11 +37,13 @@ async function getICS() {
   await page.goto("https://sa-nhlstenden.xedule.nl");
 
   try {
-    await manualLogin(page);
+    await page.type("#userNameInput", username);
+    await page.type("#passwordInput", password);
+    await page.click("#submitButton");
   } catch (error) {
     await page.authenticate({
-      username: process.env.USER_NAME,
-      password: process.env.PASSWORD
+      username,
+      password
     });
   }
 
@@ -70,15 +86,25 @@ async function getICS() {
   return filePath;
 }
 
-/**
- * fallback for loggin in
- * @param {puppeteer.Page} page
- * @returns {Promise<void>}
- */
-async function manualLogin(page) {
-  await page.type("#userNameInput", process.env.USER_NAME);
-  await page.type("#passwordInput", process.env.PASSWORD);
-  await page.click("#submitButton");
-}
-
-getICS();
+yargs
+  .scriptName("xedule-scraper")
+  .usage("$0 <command> [args]")
+  .command(
+    "login [username] [password]",
+    "authenticate",
+    args => {
+      args.positional("username", {
+        type: "string",
+        describe: "your nhl-stenden username"
+      });
+      args.positional("password", {
+        type: "string",
+        describe: "your nhl-stenden password"
+      });
+    },
+    async ({ username, password }) => {
+      await keytar.setPassword("xedule-scraper", username, password);
+      await getICS();
+    }
+  )
+  .help().argv;
