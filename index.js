@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const fs = require("fs");
 const keytar = require("keytar");
 const cron = require("node-cron");
@@ -139,6 +141,7 @@ yargs
       args
         .positional("classes", {
           type: "string",
+          describe: "the classes you want to scrape",
         })
         .array("classes");
     },
