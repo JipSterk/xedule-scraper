@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 const fs = require("fs");
 const keytar = require("keytar");
 const cron = require("node-cron");
