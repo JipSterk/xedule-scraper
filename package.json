@@ -1,6 +1,6 @@
 {
   "name": "xedule-scraper",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "scrapes your nhlstenden's roster",
   "main": "xedule-scraper.js",
   "bin": {
