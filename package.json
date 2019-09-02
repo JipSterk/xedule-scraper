@@ -1,10 +1,20 @@
 {
   "name": "xedule-scraper",
   "version": "1.0.3",
+  "description": "scrapes your nhlstenden's roster",
+  "main": "xedule-scraper.js",
   "bin": {
     "xedule-scraper": "xedule-scraper.js"
   },
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JipSterk/xedule-scraper.git"
+  },
+  "author": {
+    "email": "17934897+JipSterk@users.noreply.github.com",
+    "name": "Jip Sterk"
+  },
+  "homepage": "https://github.com/JipSterk/xedule-scraper#readme",
   "license": "MIT",
   "dependencies": {
     "cross-env": "^5.2.1",
