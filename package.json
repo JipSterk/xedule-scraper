@@ -1,6 +1,9 @@
 {
   "name": "xedule-scraper",
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "bin": {
+    "xedule-scraper": "index"
+  },
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
