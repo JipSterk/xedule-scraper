@@ -1,12 +1,3 @@
-// import "dotenv/config";
-// import fs from "fs";
-// import keytar from "keytar";
-// import cron from "node-cron";
-// import path from "path";
-// import puppeteer from "puppeteer";
-// import util from "util";
-// import yargs from "yargs";
-
 const fs = require("fs");
 const keytar = require("keytar");
 const cron = require("node-cron");
@@ -16,9 +7,7 @@ const util = require("util");
 const yargs = require("yargs");
 
 cron.schedule("0 0 * * 1", async () => {
-  const filePath = await getICS();
-  console.log(filePath);
-  // await importIntoCalender();
+  await getICS();
 });
 
 /**
@@ -31,8 +20,9 @@ async function getICS() {
   );
 
   const browser = await puppeteer.launch({
-    headless: process.env.NODE_ENV === "production"
+    headless: process.env.NODE_ENV === "production",
   });
+
   const page = await browser.newPage();
   await page.goto("https://sa-nhlstenden.xedule.nl");
 
@@ -40,21 +30,21 @@ async function getICS() {
     await page.type("#userNameInput", username);
     await page.type("#passwordInput", password);
     await page.click("#submitButton");
-  } catch (error) {
+  } catch {
     await page.authenticate({
       username,
-      password
+      password,
     });
   }
 
   await page.waitForSelector(".search-toggle");
   await page.click(".search-toggle");
 
-  for (const text of [
-    "IC_ICT_HBO ICT 1B",
-    "IC_ICT VT_EXAM Y1",
-    "IC_ICT_Internet of Things (INTH) - groep a"
-  ]) {
+  const classesPath = path.resolve(__dirname, "classes.json");
+  const json = await util.promisify(fs.readFile)(classesPath);
+  const classes = JSON.parse(json);
+
+  for (const text of classes) {
     await page.type("#rosterEntitiesSelector-entity-filter", text);
     await page.keyboard.down("Enter");
     await page.waitForSelector("#rosterEntitiesSelector-entity-filter");
@@ -69,7 +59,7 @@ async function getICS() {
 
   await page._client.send("Page.setDownloadBehavior", {
     behavior: "allow",
-    downloadPath
+    downloadPath,
   });
 
   await page.click(".k-state-default.k-view-ics");
@@ -86,6 +76,24 @@ async function getICS() {
   return filePath;
 }
 
+/**
+ * Sets the classes
+ * @returns {Promise<string>} the path of the rosters file
+ */
+async function setClasses(classes) {
+  const classesPath = path.resolve(__dirname, "classes.json");
+  const json = JSON.stringify(classes, "", 2);
+
+  await util.promisify(fs.writeFile)(classesPath, json, error => {
+    if (error) {
+      console.error(error);
+      process.exit(1);
+    }
+  });
+
+  return classesPath;
+}
+
 yargs
   .scriptName("xedule-scraper")
   .usage("$0 <command> [args]")
@@ -95,16 +103,51 @@ yargs
     args => {
       args.positional("username", {
         type: "string",
-        describe: "your nhl-stenden username"
+        describe: "your nhl-stenden username",
       });
       args.positional("password", {
         type: "string",
-        describe: "your nhl-stenden password"
+        describe: "your nhl-stenden password",
       });
     },
     async ({ username, password }) => {
+      if (!username) {
+        console.error("no username");
+        process.exit(1);
+      }
+      if (!password) {
+        console.log("no password");
+        process.exit(1);
+      }
       await keytar.setPassword("xedule-scraper", username, password);
-      await getICS();
+      process.exit(0);
     }
   )
-  .help().argv;
+  .command(
+    "fetch-roster",
+    "fetches the current roster",
+    () => {},
+    async () => {
+      await getICS();
+      process.exit(0);
+    }
+  )
+  .command(
+    "set-classes [classes]",
+    "sets the classes to be scraped",
+    args => {
+      args
+        .positional("classes", {
+          type: "string",
+        })
+        .array("classes");
+    },
+    async ({ classes }) => {
+      if (!classes) {
+        console.log("no classes");
+        process.exit(0);
+      }
+      await setClasses(classes);
+      process.exit(0);
+    }
+  ).argv;
