@@ -7,9 +7,15 @@ const puppeteer = require("puppeteer");
 const util = require("util");
 const yargs = require("yargs");
 
-cron.schedule("0 0 * * 0", async () => {
-  await getICS();
-});
+cron.schedule(
+  "0 0 * * 1",
+  async () => {
+    const path = await getICS();
+    console.log(`downloaded file to ${path}`);
+    process.exit(0);
+  },
+  { timezone: "Europe/Amsterdam" }
+);
 
 /**
  * Gets .ics file
