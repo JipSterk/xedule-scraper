@@ -7,7 +7,7 @@ const puppeteer = require("puppeteer");
 const util = require("util");
 const yargs = require("yargs");
 
-cron.schedule("0 0 * * 1", async () => {
+cron.schedule("0 0 * * 0", async () => {
   await getICS();
 });
 
@@ -85,12 +85,7 @@ async function setClasses(classes) {
   const classesPath = path.resolve(__dirname, "classes.json");
   const json = JSON.stringify(classes, "", 2);
 
-  await util.promisify(fs.writeFile)(classesPath, json, error => {
-    if (error) {
-      console.error(error);
-      process.exit(1);
-    }
-  });
+  await util.promisify(fs.writeFile)(classesPath, json);
 
   return classesPath;
 }
@@ -129,7 +124,8 @@ yargs
     "fetches the current roster",
     () => {},
     async () => {
-      await getICS();
+      const path = await getICS();
+      console.log(`downloaded file to ${path}`);
       process.exit(0);
     }
   )
